@@ -70,7 +70,7 @@ for j = 1:Psteps+1
 
     %External Force Matrix
     P = zeros(ndof,1);
-    nodeOfAction = round(c / l * (N-1)); %Location that Py acts: location/length * number of edges
+     comp; %Location that Py acts: location/length * number of edges
     P(2*nodeOfAction) = Py;
     
     %Time Stepping

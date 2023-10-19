@@ -67,11 +67,12 @@ end
 %Initial Velocity Vector
 u0 = zeros(ndof,1); 
 
-%Middle-node Velocity Array
-midNodeVelocity = zeros(steps,1); 
-
 %Number of Steps
 steps = round(maxTime / dt); 
+
+%Middle-node Position and Velocity Arrays
+midNodePosition = zeros(steps,1);
+midNodeVelocity = zeros(steps,1); 
 
 %Time-Stepping Scheme
 for k = 1:steps-1
@@ -114,22 +115,34 @@ for k = 1:steps-1
     q0 = q;
     u0 = u;
 
-    %Store Mid-Node Velocity (Node 2)
+    %Store Mid-Node Position and Velocity (Node 2)
+    midNodePosition(k+1) = q(4);
     midNodeVelocity(k+1) = u(4);
+
 
     %Plot beam positions (real time)
     figure(1)
-    clf;
+    if (k == 1|| k == 2 || k == 6 || k == 11 || k == 101 || k == 999) 
     plot(q(1:2:end), q(2:2:end), 'ro-');
     axis equal;
     xlabel('x (meter)');
     ylabel('y (meter)');
     drawnow
+    hold on
+    end
 end
-    
-%Plot mid-node y-velocity
+
+%Plot mid-node y-position
 t = (0:steps-1) * dt; %time array
 figure(2)
+plot(t,midNodePosition, 'k-'); 
+xlabel('t [s]'); 
+ylabel('y [m]');
+
+
+%Plot mid-node y-velocity
+t = (0:steps-1) * dt; %time array
+figure(3)
 plot(t,midNodeVelocity, 'k-'); 
 xlabel('t [s]'); 
 ylabel('u_y [m/s]');
@@ -151,6 +164,9 @@ u0 = zeros(ndof,1); %velocity vector
 
 %Time-Stepping Parameters
 steps = round(maxTime / dt); %number of steps
+
+%Middle-node Position and Velocity Arrays
+midNodePosition = zeros(steps,1);
 midNodeVelocity = zeros(steps,1); %middle-node velocity array
 
 %Time-Stepping Scheme
@@ -175,13 +191,14 @@ for k = 1:steps-1
     q0 = q;
     u0 = u;
 
-    %Mid-Node Velocity (Node 2)
+    %Mid-Node Velocity and Position (Node 2)
+    midNodePosition(k+1) = q(4);
     midNodeVelocity(k+1) = u(4);
 
 end
 
 %plot beam position (not in real time, since explicit is slow)
-figure(3)
+figure(4)
 clf;
 plot(q(1:2:end), q(2:2:end), 'ro-');
 axis equal;
@@ -190,7 +207,14 @@ ylabel('y (meter)');
 
 %plot mid-node y-velocity
 t = (0:steps-1) * dt; %time array
-figure(4)
+figure(5)
+plot(t,midNodePosition, 'k-'); 
+xlabel('t [s]'); 
+ylabel('u_y [m/s]');
+
+%plot mid-node y-velocity
+t = (0:steps-1) * dt; %time array
+figure(6)
 plot(t,midNodeVelocity, 'k-'); 
 xlabel('t [s]'); 
 ylabel('u_y [m/s]');
