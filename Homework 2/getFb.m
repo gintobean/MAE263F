@@ -1,0 +1,40 @@
+% Inputs: 
+% q - DOF vector (4*nv - 1 x 1)
+% m1 - 1st material director (ne x 3)
+% m2 - 2nd marerial director (ne x 3)
+%
+% Outputs:
+% Fb - bending force vector (4*nv - 1 x 1)
+% Jb - bending Jacobian vector (4*nv - 1 x 4*nv - 1)
+
+function [Fb, Jb] = getFb(q, m1, m2)
+    global kappaBar EI voronoiLength
+
+    %define dimensions
+    nv = (length(q)+1) / 4;
+
+    %initialize Fb and Jb
+    Fb = zeros(size(q)); %bending force vector
+    Jb = zeros(length(q), length(q)); %jacobian of bending force
+
+    % Bending force ar each node except first and last node
+    for i=2:nv-1 %loop over nodes
+        n0 = transpose(q(4*i-7:4*i-5)); %previous node
+        n1 = transpose(q(4*i-3:4*i-1)); %current node
+        n2 = transpose(q(4*i+1:4*i+3)); %next node
+        m1e = m1(i-1, :); % material director of previous edge
+        m2e = m2(i-1, :); % material director of previous edge
+        m1f = m1(i, :); % material director of current edge
+        m2f = m2(i, :); % material direcor of current edge
+        
+        %compute bending energies using appendix functions
+        [dF, dJ] = gradEb_hessEb(n0, n1, n2, m1e, m2e, m1f, m2f, ...
+        kappaBar(i,:), voronoiLength(i), EI);
+        
+        ind = 4*i-7:4*i+3; % 11 numbers
+
+        %append dF and dJ to force vector and jacobian
+        Fb(ind) = Fb(ind) - dF;
+        Jb(ind, ind) = Jb(ind, ind) - dJ;
+    end
+end
